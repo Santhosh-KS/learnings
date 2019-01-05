@@ -34,7 +34,3 @@ you need to create a softlink under **client/ui/** a link to Wt's resource direc
 If you want to change the IP or port number. Feel free to have a look at the **build.sh** file and modify as required.
 
 There will be Three binaries will be built viz **Client, Server and unitTest**. You can selectively enable or disable their build by commenting the respective **xyz.cmake** in CMakeList.txt file
-
-## Here is the quick demo of the project.
-
-[![Watch the video](http://i3.ytimg.com/vi/rRr-dCAFBMk/maxresdefault.jpg)](https://www.youtube.com/watch?v=rRr-dCAFBMk)
