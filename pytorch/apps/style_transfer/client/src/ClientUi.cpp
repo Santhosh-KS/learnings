@@ -184,6 +184,65 @@ bool ClientUiApplication::ValidateUrl(std::string &url)
   return retVal;
 }
 
+void ClientUiApplication::SendRequest()
+{
+  std::string serverIp("localhost");
+
+  int port(5678);
+  std::string jsonFile("/opt/pytorch/data/Request.json");
+  std::string sessIdKey("SessionId");
+
+  JsonFileParser parser(jsonFile);
+  TcpClient client(serverIp, port);
+
+  std::string sessIdVal(sessionId());
+  std::string contentImgUrl("ContentImageUrl");
+  std::string styleImgUrl("StyleImageUrl");
+
+  parser.SetString(sessIdKey, sessIdVal);
+  parser.SetString(contentImgUrl, ContentImageUrl);
+  parser.SetString(styleImgUrl, StyleImageUrl);
+  std::string req(parser.GetStrigifiedJson());
+  std::string resp(client.Connect(req));
+  std::cout << "Before parser resp = " << resp.c_str() << "\n";
+  ParseResponse(resp);
+}
+
+void ClientUiApplication::ParseResponse(std::string resp)
+{
+  std::string sessIdKey("SessionId");
+  std::string statusKey("Status");
+  std::string predKey("Prediction");
+
+  std::cout << " resp = " << resp.c_str() << "\n";
+  std::string err("ERROR");
+  // Handle the error when connection to TCP socket is having some problem.
+  if(resp.find(err) != std::string::npos) {
+    Wt::WMessageBox::show("Information", resp.c_str(), Wt::StandardButton::Ok);
+    return;
+  }
+  else {
+    std::unique_ptr<JsonStringParser> respParser =  std::make_unique<JsonStringParser>(resp);;
+    std::string sessId(respParser->GetString(sessIdKey));
+    std::string status(respParser->GetString(statusKey));
+    uint64_t prediction(respParser->GetUInt64(predKey));
+   if (sessId.compare(sessionId()) == 0) {
+      //if (status.compare("200 OK") == 0) {
+
+      //}
+      //else {
+        std::string msg("Got Status ");
+        msg += status + " from server";
+        Wt::WMessageBox::show("Information", msg.c_str(), Wt::StandardButton::Ok);
+      //}
+    }
+    else {
+      Wt::WMessageBox::show("Information", "Invalid Session ID." , Wt::StandardButton::Ok);
+    }
+  }
+}
+
+
 void ClientUiApplication::OnSearchContentButtonPressed()
 {
   auto url(SearchContentLineEdit->text().toUTF8());
@@ -191,6 +250,7 @@ void ClientUiApplication::OnSearchContentButtonPressed()
     std::cout << "URL: " << url.c_str() << "\n";
     ContentImageUrl = url;
     SetupImgs();
+    SendRequest();
   }
 }
 

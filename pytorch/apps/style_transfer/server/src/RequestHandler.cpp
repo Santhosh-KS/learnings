@@ -33,7 +33,7 @@ RequestHandler::RequestHandler(std::string &modelFile, std::string &respFile):
   ModelFile(modelFile),
   RespTemplateFile(respFile)
 {
-  GetSupportedModels();
+  //GetSupportedModels();
 }
 
 RequestHandler::~RequestHandler()
@@ -86,7 +86,8 @@ RequestHandler::ReadRequest(std::string &req)
 std::string RequestHandler::ResponseCreator(std::string &sessionId)
 {
   std::string file("/tmp/pytorch/");
-  file += sessionId + "/response.json";
+  //file += sessionId + "/response.json";
+  file += "/response.json";
 
   JsonFileParser parser(file);
   return parser.GetStrigifiedJson();
@@ -96,7 +97,7 @@ std::string RequestHandler::ProcessRequest(std::string &req)
 {
   RequestHandler::RequestElements reqElements = ReadRequest(req);
 
-  if (reqElements.ModelId > ModelsVector.size()) {
+/*  if (reqElements.ModelId > ModelsVector.size()) {
     // Models.json file mismatch.
   }
   else {
@@ -110,6 +111,6 @@ std::string RequestHandler::ProcessRequest(std::string &req)
     cmd = python + space + modelScript + space + cliOptions;
     std::cout << "Ready to rock: " << cmd.c_str() << "\n";
     CmdUtil.ExecuteCommand(cmd);
-  }
+  }*/
   return ResponseCreator(reqElements.SessionId);
 }

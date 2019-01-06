@@ -71,6 +71,7 @@ private:
   void ParseResponse(std::string resp);
   bool ValidateUrl(std::string &url);
   void SetupImgs();
+  void SendRequest();
 public:
   ClientUiApplication(const Wt::WEnvironment& env);
   ~ClientUiApplication();
