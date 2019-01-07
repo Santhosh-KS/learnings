@@ -45,11 +45,12 @@ private:
   Wt::WLineEdit *SearchContentLineEdit;
   Wt::WPushButton *SearchStyleButton;
   Wt::WPushButton *SearchContentButton;
-  Wt::WPushButton *PredictButton;
+  Wt::WPushButton *TransferImageButton;
   Wt::WContainerWidget *MainSearchDiv;
   Wt::WContainerWidget *FooterDiv;
   Wt::WContainerWidget *MainImageDiv;
   Wt::WContainerWidget *MainComboDiv;
+  Wt::WContainerWidget *MainBtnDiv;
   Wt::WImage *StyleImage;
   Wt::WImage *ContentImage;
   Wt::WComboBox *ModelComboBox;
@@ -65,6 +66,7 @@ private:
   void SetupStyleImageWindow(Wt::WContainerWidget *mainImgDiv);
   void OnSearchStyleButtonPressed();
   void OnSearchContentButtonPressed();
+  void OnTransferButtonPressed();
   bool CheckFileExists(std::string &file);
   int ExecuteCommand(std::string &cmd);
   bool GetModelsFromJson();
@@ -72,6 +74,7 @@ private:
   bool ValidateUrl(std::string &url);
   void SetupImgs();
   void SendRequest();
+  void SetupTransferButton();
 public:
   ClientUiApplication(const Wt::WEnvironment& env);
   ~ClientUiApplication();

@@ -48,8 +48,8 @@ class RequestHandler : public NotCopyable
 
     struct RequestElements {
       std::string SessionId;
-      std::string ImageUrl;
-      uint64_t ModelId;
+      std::string ContentImageUrl;
+      std::string StyleIMageUrl;
     };
 
     inline bool HaveModelsToWork() { return ModelsVector.empty(); }
@@ -60,6 +60,7 @@ class RequestHandler : public NotCopyable
     std::string ResponseCreator(std::string &sessionId);
   public:
     RequestHandler(std::string &modelFile, std::string &respFile);
+    RequestHandler(std::string &respFile);
     ~RequestHandler();
     std::string ProcessRequest(std::string &req);
 };

@@ -242,6 +242,55 @@ void ClientUiApplication::ParseResponse(std::string resp)
   }
 }
 
+void ClientUiApplication::SetupImgs()
+{
+  root()->removeWidget(MainImageDiv);
+  root()->removeWidget(FooterDiv);
+  MainImageDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  SetupStyleImageWindow(MainImageDiv);
+  if (!StyleImageUrl.empty() && !ContentImageUrl.empty()) {
+    SetupTransferButton();
+  }
+  SetupFooter();
+}
+
+void ClientUiApplication::SetupTransferButton()
+{
+  root()->removeWidget(MainBtnDiv);
+
+  MainBtnDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  MainBtnDiv->setId("main_left");
+
+  Wt::WContainerWidget *rowDiv = MainBtnDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  rowDiv->setStyleClass("row");
+
+  Wt::WContainerWidget *columnLeftDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnLeftDiv->setStyleClass("col-md-3  col-xs-3 col-sm-3");
+
+  Wt::WContainerWidget *columnMidDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnMidDiv->setStyleClass("col-md-6  col-xs-3 col-sm-3");
+
+  TransferImageButton = columnMidDiv->addWidget(std::make_unique<Wt::WPushButton>("Abraca Dabra"));
+  TransferImageButton->setStyleClass(Wt::WString::fromUTF8("btn btn-success with-label btn-block"));
+
+  Wt::WContainerWidget *columnRightDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnRightDiv->setStyleClass("col-md-3  col-xs-3 col-sm-3");
+
+  TransferImageButton->clicked().connect(this, &ClientUiApplication::OnTransferButtonPressed);
+
+  if (ContentImageUrl.empty() || StyleImageUrl.empty()) {
+    TransferImageButton->setEnabled(false);
+  }
+  else {
+    TransferImageButton->setEnabled(true);
+  }
+}
+
+// Event and button click handlers.
+void ClientUiApplication::OnTransferButtonPressed()
+{
+  SendRequest();
+}
 
 void ClientUiApplication::OnSearchContentButtonPressed()
 {
@@ -250,21 +299,9 @@ void ClientUiApplication::OnSearchContentButtonPressed()
     std::cout << "URL: " << url.c_str() << "\n";
     ContentImageUrl = url;
     SetupImgs();
-    SendRequest();
   }
 }
 
-void ClientUiApplication::SetupImgs()
-{
-  root()->removeWidget(MainImageDiv);
-  root()->removeWidget(FooterDiv);
-  MainImageDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
-  SetupStyleImageWindow(MainImageDiv);
-  SetupFooter();
-
-}
-
-// Event and button click handlers.
 void ClientUiApplication::OnSearchStyleButtonPressed()
 {
   auto url(SearchStyleLineEdit->text().toUTF8());
@@ -276,7 +313,9 @@ void ClientUiApplication::OnSearchStyleButtonPressed()
 }
 
 ClientUiApplication::ClientUiApplication(const Wt::WEnvironment& env)
-  : WApplication(env)
+  : WApplication(env),
+  StyleImageUrl(""),
+  ContentImageUrl("")
 {
   setTitle("Style Transfer using Pytorch"); // application title
   SetupTheme();
@@ -287,6 +326,7 @@ ClientUiApplication::ClientUiApplication(const Wt::WEnvironment& env)
   MainImageDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
   SetupStyleImageWindow(MainImageDiv);
   MainImageDiv->hide();
+  MainBtnDiv= root()->addWidget(std::make_unique<Wt::WContainerWidget>());
   SetupFooter();
 }
 

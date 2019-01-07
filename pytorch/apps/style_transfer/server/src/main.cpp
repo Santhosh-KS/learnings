@@ -35,9 +35,8 @@ int main(int argc, char** argv)
   int port(5678);
   TcpServer server(port);
   std::cout << "Server Listening on port: " << port << "\n";
-  std::string modleFile("/opt/pytorch/data/Models.json");
   std::string respTemplateFile("/opt/pytorch/data/Response.json");
-  RequestHandler handler(modleFile, respTemplateFile);
+  RequestHandler handler(respTemplateFile);
   while (true) {
     server.Accept();
     std::string jsonRequest = server.Read();

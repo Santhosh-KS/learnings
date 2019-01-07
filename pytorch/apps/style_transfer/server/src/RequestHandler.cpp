@@ -29,11 +29,19 @@
 #include "JsonFileParser.hpp"
 #include <iostream>
 
+RequestHandler::RequestHandler(std::string &respFile):
+  ModelFile(""),
+  RespTemplateFile(respFile)
+{
+  // Empty
+}
+
+
 RequestHandler::RequestHandler(std::string &modelFile, std::string &respFile):
   ModelFile(modelFile),
   RespTemplateFile(respFile)
 {
-  //GetSupportedModels();
+  GetSupportedModels();
 }
 
 RequestHandler::~RequestHandler()
@@ -71,14 +79,14 @@ RequestHandler::RequestElements
 RequestHandler::ReadRequest(std::string &req)
 {
   std::string sessIdKey("SessionId");
-  std::string modelIdKey("ModelId");
-  std::string imgUrlKey("ImageUrl");
+  std::string contentImgUrlKey("ContentImageUrl");
+  std::string styleImgUrlKey("StyleImageUrl");
 
   JsonStringParser reqParser(req);
   RequestHandler::RequestElements elements;
   elements.SessionId = reqParser.GetString(sessIdKey);
-  elements.ImageUrl = reqParser.GetString(imgUrlKey);
-  elements.ModelId = reqParser.GetUInt64(modelIdKey);
+  elements.ContentImageUrl = reqParser.GetString(contentImgUrlKey);
+  elements.StyleIMageUrl = reqParser.GetString(styleImgUrlKey);
 
   return elements;
 }
