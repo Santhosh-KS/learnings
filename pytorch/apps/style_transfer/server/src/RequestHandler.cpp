@@ -104,6 +104,16 @@ std::string RequestHandler::ResponseCreator(std::string &sessionId)
 std::string RequestHandler::ProcessRequest(std::string &req)
 {
   RequestHandler::RequestElements reqElements = ReadRequest(req);
+    std::string python("python");
+//    std::string modelScript("/opt/pytorch/scripts/modelLoader.py");
+    std::string cliOptions(" -u ");
+    cliOptions += reqElements.ImageUrl + " -i " +
+      std::to_string(reqElements.ModelId) + " -s " + reqElements.SessionId;
+    std::string cmd("");
+    std::string space(" ");
+    //cmd = python + space + modelScript + space + cliOptions;
+    std::cout << "Ready to rock: " << cmd.c_str() << "\n";
+  //  CmdUtil.ExecuteCommand(cmd);
 
 /*  if (reqElements.ModelId > ModelsVector.size()) {
     // Models.json file mismatch.
