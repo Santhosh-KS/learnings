@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/Fibbonacci.dir/fibbonacci/fib.cpp.o  -o Fibbonacci -rdynamic 
