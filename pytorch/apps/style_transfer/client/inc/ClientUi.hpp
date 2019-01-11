@@ -50,9 +50,11 @@ private:
   Wt::WContainerWidget *FooterDiv;
   Wt::WContainerWidget *MainImageDiv;
   Wt::WContainerWidget *MainComboDiv;
-  Wt::WContainerWidget *MainBtnDiv;
+  Wt::WContainerWidget *MainTransferBtnDiv;
+  Wt::WContainerWidget *MainFinalImageDiv;
   Wt::WImage *StyleImage;
   Wt::WImage *ContentImage;
+  Wt::WImage *TransferredImage;
   Wt::WComboBox *ModelComboBox;
   std::vector<std::string> ModelsVector;
   std::string StyleImageUrl;
@@ -75,6 +77,7 @@ private:
   void SetupImgs();
   void SendRequest();
   void SetupTransferButton();
+  void SetupFinalImage();
 public:
   ClientUiApplication(const Wt::WEnvironment& env);
   ~ClientUiApplication();

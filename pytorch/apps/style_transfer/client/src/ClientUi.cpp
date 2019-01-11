@@ -250,18 +250,45 @@ void ClientUiApplication::SetupImgs()
   SetupStyleImageWindow(MainImageDiv);
   if (!StyleImageUrl.empty() && !ContentImageUrl.empty()) {
     SetupTransferButton();
+    MainTransferBtnDiv->hide();
   }
   SetupFooter();
 }
 
+
+void ClientUiApplication::SetupFinalImage()
+{
+  root()->removeWidget(MainFinalImageDiv);
+  MainFinalImageDiv= root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  MainFinalImageDiv->setId("main_left");
+
+  Wt::WContainerWidget *rowDiv = MainTransferBtnDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  rowDiv->setStyleClass("row");
+
+  Wt::WContainerWidget *columnLeftDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnLeftDiv->setStyleClass("col-md-3  col-xs-3 col-sm-3");
+
+  Wt::WContainerWidget *columnMidDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnMidDiv->setStyleClass("col-md-3  col-xs-3 col-sm-3");
+
+  Wt::WContainerWidget *transferImageDiv =columnMidDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  transferImageDiv->setStyleClass("center-block");
+
+  TransferredImage = transferImageDiv->addWidget(std::make_unique<Wt::WImage>(Wt::WLink(StyleImageUrl.c_str())));
+  TransferredImage->setStyleClass("img-responsive center-block");
+
+  Wt::WContainerWidget *columnRightDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  columnRightDiv->setStyleClass("col-md-3  col-xs-3 col-sm-3");
+}
+
 void ClientUiApplication::SetupTransferButton()
 {
-  root()->removeWidget(MainBtnDiv);
+  root()->removeWidget(MainTransferBtnDiv);
 
-  MainBtnDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
-  MainBtnDiv->setId("main_left");
+  MainTransferBtnDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  MainTransferBtnDiv->setId("main_left");
 
-  Wt::WContainerWidget *rowDiv = MainBtnDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
+  Wt::WContainerWidget *rowDiv = MainTransferBtnDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
   rowDiv->setStyleClass("row");
 
   Wt::WContainerWidget *columnLeftDiv = rowDiv->addWidget(std::make_unique<Wt::WContainerWidget>());
@@ -290,6 +317,7 @@ void ClientUiApplication::SetupTransferButton()
 void ClientUiApplication::OnTransferButtonPressed()
 {
   SendRequest();
+  SetupFinalImage();
 }
 
 void ClientUiApplication::OnSearchContentButtonPressed()
@@ -326,7 +354,8 @@ ClientUiApplication::ClientUiApplication(const Wt::WEnvironment& env)
   MainImageDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
   SetupStyleImageWindow(MainImageDiv);
   MainImageDiv->hide();
-  MainBtnDiv= root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  MainTransferBtnDiv= root()->addWidget(std::make_unique<Wt::WContainerWidget>());
+  MainFinalImageDiv = root()->addWidget(std::make_unique<Wt::WContainerWidget>());
   SetupFooter();
 }
 
