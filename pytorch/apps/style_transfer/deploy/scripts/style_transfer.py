@@ -1,6 +1,6 @@
 
 # import resources
-get_ipython().run_line_magic('matplotlib', 'inline')
+#get_ipython().run_line_magic('matplotlib', 'inline')
 
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -28,28 +28,28 @@ vgg.to(device)
 
 def load_image(img_path, max_size=400, shape=None):
     ''' Load in and transform an image, making sure the image
-       is <= 400 pixels in the x-y dims.'''
-    
+    is <= 400 pixels in the x-y dims.'''
+
     image = Image.open(img_path).convert('RGB')
-    
+
     # large images will slow down processing
     if max(image.size) > max_size:
         size = max_size
     else:
         size = max(image.size)
-    
+
     if shape is not None:
         size = shape
-        
+
     in_transform = transforms.Compose([
-                        transforms.Resize(size),
-                        transforms.ToTensor(),
-                        transforms.Normalize((0.485, 0.456, 0.406), 
-                                             (0.229, 0.224, 0.225))])
+        transforms.Resize(size),
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), 
+                             (0.229, 0.224, 0.225))])
 
     # discard the transparent, alpha channel (that's the :3) and add the batch dimension
     image = in_transform(image)[:3,:,:].unsqueeze(0)
-    
+
     return image
 
 
@@ -63,7 +63,7 @@ style = load_image('images/hockney.jpg', shape=content.shape[-2:]).to(device)
 # and converting it from a Tensor image to a NumPy image for display
 def im_convert(tensor):
     """ Display a tensor as an image. """
-    
+
     image = tensor.to("cpu").clone().detach()
     image = image.numpy().squeeze()
     image = image.transpose(1,2,0)
@@ -83,9 +83,9 @@ ax2.imshow(im_convert(style))
 
 def get_features(image, model, layers=None):
     """ Run an image forward through a model and get the features for 
-        a set of layers. Default layers are for VGGNet matching Gatys et al (2016)
+    a set of layers. Default layers are for VGGNet matching Gatys et al (2016)
     """
-    
+
     ## TODO: Complete mapping layer names of PyTorch's VGGNet to names from the paper
     ## Need the layers for the content and style representations of an image
     if layers is None:
@@ -95,7 +95,7 @@ def get_features(image, model, layers=None):
                   '19': 'conv4_1',
                   '21': 'conv4_2',  ## content representation
                   '28': 'conv5_1'}
-        
+
     features = {}
     x = image
     # model._modules is a dictionary holding each module in the model
@@ -103,7 +103,7 @@ def get_features(image, model, layers=None):
         x = layer(x)
         if name in layers:
             features[layers[name]] = x
-            
+
     return features
 
 
@@ -111,29 +111,29 @@ def get_features(image, model, layers=None):
 # ## Gram Matrix 
 # 
 # The output of every convolutional layer is a Tensor with dimensions associated with the `batch_size`, a depth, `d` and some height and width (`h`, `w`). The Gram matrix of a convolutional layer can be calculated as follows:
-# * Get the depth, height, and width of a tensor using `batch_size, d, h, w = tensor.size`
-# * Reshape that tensor so that the spatial dimensions are flattened
-# * Calculate the gram matrix by multiplying the reshaped tensor by it's transpose 
-# 
-# *Note: You can multiply two matrices using `torch.mm(matrix1, matrix2)`.*
+    # * Get the depth, height, and width of a tensor using `batch_size, d, h, w = tensor.size`
+    # * Reshape that tensor so that the spatial dimensions are flattened
+    # * Calculate the gram matrix by multiplying the reshaped tensor by it's transpose 
+    # 
+    # *Note: You can multiply two matrices using `torch.mm(matrix1, matrix2)`.*
 
 # In[1]:
 
 
 def gram_matrix(tensor):
     """ Calculate the Gram Matrix of a given tensor 
-        Gram Matrix: https://en.wikipedia.org/wiki/Gramian_matrix
+    Gram Matrix: https://en.wikipedia.org/wiki/Gramian_matrix
     """
-    
+
     # get the batch_size, depth, height, and width of the Tensor
     _, d, h, w = tensor.size()
-    
+
     # reshape so we're multiplying the features for each channel
     tensor = tensor.view(d, h * w)
-    
+
     # calculate the gram matrix
     gram = torch.mm(tensor, tensor.t())
-    
+
     return gram 
 
 
@@ -186,13 +186,13 @@ optimizer = optim.Adam([target], lr=0.003)
 steps = 2000  # decide how many iterations to update your image (5000)
 
 for ii in range(1, steps+1):
-    
+
     # get the features from your target image
     target_features = get_features(target, vgg)
-    
+
     # the content loss
     content_loss = torch.mean((target_features['conv4_2'] - content_features['conv4_2'])**2)
-    
+
     # the style loss
     # initialize the style loss to 0
     style_loss = 0
@@ -208,15 +208,15 @@ for ii in range(1, steps+1):
         layer_style_loss = style_weights[layer] * torch.mean((target_gram - style_gram)**2)
         # add to the style loss
         style_loss += layer_style_loss / (d * h * w)
-        
+
     # calculate the *total* loss
     total_loss = content_weight * content_loss + style_weight * style_loss
-    
+
     # update your target image
     optimizer.zero_grad()
     total_loss.backward()
     optimizer.step()
-    
+
     # display intermediate images and print the loss
     if  ii % show_every == 0:
         print('Total loss: ', total_loss.item())
@@ -225,7 +225,55 @@ for ii in range(1, steps+1):
 
 
 # display content and final, target image
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-ax1.imshow(im_convert(content))
-ax2.imshow(im_convert(target))
+#fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+#ax1.imshow(im_convert(content))
+#ax2.imshow(im_convert(target))
+
+from argparse import ArgumentParser
+
+def GetCommandLineArgs():
+    parser = ArgumentParser()
+    parser.add_argument("-su", "--style_url", dest="s_url", help="URL of the image to be used as style image.[mandatory]", metavar="URL")
+    parser.add_argument("-cu", "--content_url", dest="c_url", help="URL of the image to be used as content image.[mandatory]", metavar="URL")
+    parser.add_argument("-s", "--session", dest="sessionId", help="Session ID of the http request.[mandatory]", metavar="Session ID")
+
+    args = parser.parse_args()
+
+    c_url = ''
+    sessId = ''
+    s_url = '' 
+
+    if not args.c_url:
+        print('Invalid Command aruguments.')
+        print('Usage:')
+        print('"python modelLoader.py -h" for more details')
+        exit()
+    else:
+        c_url = args.c_url
+    if not args.sessionId:
+        print('Invalid  Command aruguments.')
+        print('Usage:')
+        print('"python modelLoader.py -h" for more details')
+        exit()
+    else:
+        sessId = args.sessionId
+    if not args.s_url:
+        print('Invalid Command aruguments.')
+        print('Usage:')
+        print('"python modelLoader.py -h" for more  details')
+        exit()
+    else:
+        s_url = args.s_url
+
+    return sessId, c_url, s_url 
+
+
+
+
+def main(argv):
+    sessId, c_url, s_url = GetCommandLineArgs()
+    print('session = {} url = {} modelIndex = {}'.format(sessId, url, index))
+
+if __name__ == "__main__":
+    main(sys.argv)
 
