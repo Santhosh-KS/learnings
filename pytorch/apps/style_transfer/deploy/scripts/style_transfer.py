@@ -2,15 +2,18 @@
 # import resources
 #get_ipython().run_line_magic('matplotlib', 'inline')
 
-from PIL import Image
+import sys 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import torch
 import torch.optim as optim
+
+from argparse import ArgumentParser
+from PIL import Image
 from torchvision import transforms, models
 
-
+'''
 # get the "features" portion of VGG19 (we will not need the "classifier" portion)
 vgg = models.vgg19(pretrained=True).features
 
@@ -23,7 +26,7 @@ for param in vgg.parameters():
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 vgg.to(device)
-
+'''
 
 
 def load_image(img_path, max_size=400, shape=None):
@@ -53,12 +56,6 @@ def load_image(img_path, max_size=400, shape=None):
     return image
 
 
-# load in content and style image
-content = load_image('images/octopus.jpg').to(device)
-# Resize style to match content, makes code easier
-style = load_image('images/hockney.jpg', shape=content.shape[-2:]).to(device)
-
-
 # helper function for un-normalizing an image 
 # and converting it from a Tensor image to a NumPy image for display
 def im_convert(tensor):
@@ -74,10 +71,10 @@ def im_convert(tensor):
 
 
 # display the images
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
+#fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
 # content and style ims side-by-side
-ax1.imshow(im_convert(content))
-ax2.imshow(im_convert(style))
+#ax1.imshow(im_convert(content))
+#ax2.imshow(im_convert(style))
 
 
 
@@ -142,16 +139,23 @@ def gram_matrix(tensor):
 # Now that we've written functions for extracting features and computing the gram matrix of a given convolutional layer; let's put all these pieces together! We'll extract our features from our images and calculate the gram matrices for each layer in our style representation.
 
 # get content and style features only once before training
+#KSS need this
+'''
 content_features = get_features(content, vgg)
 style_features = get_features(style, vgg)
+'''
 
 # calculate the gram matrices for each layer of our style representation
+'''
 style_grams = {layer: gram_matrix(style_features[layer]) for layer in style_features}
 
+'''
 # create a third "target" image and prep it for change
 # it is a good idea to start of with the target as a copy of our *content* image
 # then iteratively change its style
+'''
 target = content.clone().requires_grad_(True).to(device)
+'''
 
 
 # ---
@@ -168,6 +172,7 @@ target = content.clone().requires_grad_(True).to(device)
 # weights for each style layer 
 # weighting earlier layers more will result in *larger* style artifacts
 # notice we are excluding `conv4_2` our content representation
+'''
 style_weights = {'conv1_1': 1.,
                  'conv2_1': 0.75,
                  'conv3_1': 0.2,
@@ -223,13 +228,13 @@ for ii in range(1, steps+1):
         plt.imshow(im_convert(target))
         plt.show()
 
+'''
 
 # display content and final, target image
 #fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
 #ax1.imshow(im_convert(content))
 #ax2.imshow(im_convert(target))
 
-from argparse import ArgumentParser
 
 def GetCommandLineArgs():
     parser = ArgumentParser()
@@ -267,12 +272,26 @@ def GetCommandLineArgs():
 
     return sessId, c_url, s_url 
 
-
-
-
 def main(argv):
     sessId, c_url, s_url = GetCommandLineArgs()
-    print('session = {} url = {} modelIndex = {}'.format(sessId, url, index))
+    print('session = {} content url = {} style url = {}'.format(sessId, c_url,
+                                                                s_url))
+    # load in content and style image
+    content = load_image(c_url).to(device)
+    # Resize style to match content, makes code easier
+    style = load_image(s_url, shape=content.shape[-2:]).to(device)
+
+'''
+    # get the "features" portion of VGG19 (we will not need the "classifier" portion)
+    vgg = models.vgg19(pretrained=True).features
+    # freeze all VGG parameters since we're only optimizing the target image
+    for param in vgg.parameters():
+        param.requires_grad_(False)
+        # move the model to GPU, if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    vgg.to(device)
+'''
+
 
 if __name__ == "__main__":
     main(sys.argv)
